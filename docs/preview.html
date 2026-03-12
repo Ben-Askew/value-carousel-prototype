@@ -1,0 +1,1263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=393, initial-scale=1.0">
+  <title>Value Carousel – Full Screen Preview</title>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --text-primary: #2E3333;
+      --text-tertiary: #ABADAD;
+      --anchovy-0: #0B0E0E;
+      --anchovy-30: #535F5F;
+      --anchovy-40: #637070;
+      --kelp-40: #097387;
+      --apple-30: #17730D;
+      --success: #4D7C1B;
+      --action: #00CCBC;
+      --brand: #00CCBC;
+      --error: #CC3A2F;
+      --critical-emphasis: #DF1619;
+      --bg-main: #F9FAFA;
+      --bg-surface: #FFFFFF;
+      --bg-brand-subtle: #00CCBD;
+      --border-default: rgba(0,0,0,0.08);
+      --border-light: rgba(0,0,0,0.04);
+      --shadow-shallow: 0px 1px 4px 0px rgba(0,0,0,0.08);
+      --shadow-deep-up: 0px -6px 20px 0px rgba(0,0,0,0.08);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'IBM Plex Sans', sans-serif;
+      background: #3a3f47;
+      display: flex;
+      justify-content: center;
+      padding: 40px 20px;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .phone {
+      width: 393px;
+      height: 852px;
+      background: var(--bg-surface);
+      border-radius: 44px;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2), 0 0 0 1px rgba(0,0,0,0.05);
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Status Bar ── */
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 28px 8px;
+      background: var(--bg-surface);
+      flex-shrink: 0;
+    }
+    .status-time {
+      font-family: -apple-system, 'SF Pro Text', system-ui, sans-serif;
+      font-size: 17px;
+      font-weight: 600;
+      letter-spacing: -0.38px;
+      color: black;
+    }
+    .status-icons { display: flex; gap: 7px; align-items: center; }
+    .status-icons svg { display: block; }
+
+    /* ── Delivery Header ── */
+    .nav-header {
+      display: flex;
+      align-items: center;
+      padding: 12px 16px;
+      background: var(--bg-surface);
+      flex-shrink: 0;
+      height: 64px;
+    }
+    .rider-illust {
+      width: 48px;
+      height: 48px;
+      flex-shrink: 0;
+      margin-right: 6px;
+    }
+    .rider-illust img { width: 100%; height: 100%; }
+    .nav-text { flex: 1; }
+    .nav-label {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--anchovy-30);
+      line-height: 20px;
+    }
+    .nav-location {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .nav-location-text {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 24px;
+    }
+    .nav-chevron {
+      width: 18px;
+      height: 18px;
+      color: var(--action);
+    }
+    .nav-actions { display: flex; gap: 8px; }
+    .nav-btn {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid #e8ebeb;
+      background: var(--bg-surface);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .nav-btn img { width: 20px; height: 20px; object-fit: contain; }
+
+    /* ── Search Bar ── */
+    .search-wrap {
+      padding: 8px 16px;
+      background: var(--bg-surface);
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      box-shadow: var(--shadow-shallow);
+      flex-shrink: 0;
+      height: 56px;
+    }
+    .search-field {
+      flex: 1;
+      background: var(--bg-main);
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      padding: 0 15px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      height: 40px;
+    }
+    .search-field svg { flex-shrink: 0; }
+    .search-text {
+      font-size: 16px;
+      color: var(--text-tertiary);
+      line-height: 24px;
+    }
+    .search-filter { flex-shrink: 0; }
+    .search-filter svg { display: block; }
+
+    /* ── Scrollable Feed ── */
+    .feed {
+      flex: 1;
+      overflow-y: auto;
+      background: var(--bg-main);
+      padding-bottom: 0;
+    }
+
+    /* ── Section Header ── */
+    .sec-header {
+      padding: 24px 16px 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+    }
+    .sec-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 24px;
+    }
+
+    /* ── Regular Cards ── */
+    .h-scroll {
+      display: flex;
+      gap: 8px;
+      padding: 0 16px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .h-scroll::-webkit-scrollbar { display: none; }
+
+    .rcard {
+      min-width: 298px;
+      max-width: 298px;
+      background: var(--bg-surface);
+      border-radius: 4px;
+      overflow: visible;
+      box-shadow: var(--shadow-shallow);
+      border: 0.5px solid var(--border-default);
+      flex-shrink: 0;
+      position: relative;
+    }
+    .rcard-img-wrap { position: relative; overflow: hidden; border-radius: 4px 4px 0 0; }
+    .rcard-img {
+      width: 100%;
+      height: 130px;
+      object-fit: cover;
+      display: block;
+    }
+    .rcard-fav {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 8px 8px 0 0;
+      background: linear-gradient(225deg, rgba(0,0,0,0.15) 0%, rgba(196,196,196,0) 61.25%);
+      z-index: 1;
+    }
+    .rcard-fav svg { filter: drop-shadow(0 1px 4px rgba(0,0,0,0.08)); }
+    .eod {
+      position: absolute;
+      top: 114px;
+      right: 16px;
+      background: var(--bg-surface);
+      border: 1px solid var(--border-default);
+      border-radius: 100px;
+      padding: 4px 12px;
+      display: flex;
+      align-items: baseline;
+      gap: 2px;
+      white-space: nowrap;
+      z-index: 2;
+    }
+    .eod-time {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--anchovy-0);
+      line-height: 24px;
+    }
+    .eod-unit {
+      font-size: 16px;
+      font-weight: 400;
+      color: var(--anchovy-40);
+      line-height: 24px;
+    }
+    .rcard-body { padding: 12px 16px; position: relative; z-index: 1; background: var(--bg-surface); border-radius: 0 0 4px 4px; }
+    .rcard-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 24px;
+    }
+    .rcard-meta {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      line-height: 20px;
+    }
+    .rcard-meta svg { flex-shrink: 0; }
+    .c-success { color: var(--success); }
+    .c-anchovy { color: var(--anchovy-30); }
+
+    /* ── Value Carousel ── */
+    .vc-wrap { padding: 0 16px 16px; }
+    .vc-bg {
+      border-radius: 8px;
+      background: linear-gradient(186deg, #03706D 36%, #1BA69C 99%);
+      overflow: hidden;
+    }
+    .vc-header {
+      display: flex;
+      align-items: flex-start;
+      padding: 24px 16px 12px;
+      position: relative;
+      min-height: 81px;
+    }
+    .vc-text { display: flex; flex-direction: column; gap: 2px; width: 280px; }
+    .vc-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: white;
+      line-height: 24px;
+    }
+    .vc-subtitle {
+      font-size: 12px;
+      font-weight: 400;
+      color: white;
+      line-height: 16px;
+    }
+    .vc-graphic {
+      position: absolute;
+      right: 8px;
+      top: 2px;
+      width: 68px;
+      height: 68px;
+    }
+    .vc-graphic-svg {
+      position: absolute;
+      right: 0px;
+      top: 4px;
+      width: 72px;
+      height: 72px;
+    }
+
+    .vc-cards {
+      display: flex;
+      gap: 8px;
+      padding: 0 16px 16px;
+      overflow-x: auto;
+      scrollbar-width: none;
+    }
+    .vc-cards::-webkit-scrollbar { display: none; }
+
+    .vcard {
+      min-width: 280px;
+      max-width: 280px;
+      background: var(--bg-surface);
+      border-radius: 4px;
+      box-shadow: var(--shadow-shallow);
+      flex-shrink: 0;
+      position: relative;
+    }
+    .vcard-img-wrap { position: relative; height: 150px; }
+    .vcard-img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      display: block;
+      border-radius: 4px 4px 0 0;
+    }
+    .vcard-fav {
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      padding: 8px 8px 0 0;
+      background: linear-gradient(225deg, rgba(0,0,0,0.15) 0%, rgba(196,196,196,0) 61.25%);
+    }
+    .vcard-fav svg { filter: drop-shadow(0 1px 4px rgba(0,0,0,0.08)); }
+    .vcard-fav-count {
+      position: absolute;
+      bottom: 2px;
+      right: 4px;
+      font-size: 14px;
+      font-weight: 700;
+      color: white;
+      text-align: center;
+      width: 40px;
+      text-shadow: 0 1px 3px rgba(0,0,0,0.2);
+    }
+    .vcard-tag {
+      position: absolute;
+      top: 12px;
+      left: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .tag-brand {
+      background: var(--bg-brand-subtle);
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: #00211F;
+      line-height: 16px;
+    }
+    .tag-crit-line1 {
+      background: var(--bg-surface);
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--critical-emphasis);
+      line-height: 16px;
+    }
+    .tag-crit-line2 {
+      background: var(--critical-emphasis);
+      padding: 2px 8px;
+      font-size: 12px;
+      font-weight: 700;
+      color: white;
+      line-height: 16px;
+    }
+    .vc-eod {
+      position: absolute;
+      top: 134px;
+      right: 4px;
+      background: var(--bg-surface);
+      border: 0.5px solid #F1F4F4;
+      border-radius: 16px;
+      padding: 4px 16px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      box-shadow: var(--shadow-shallow);
+      white-space: nowrap;
+      z-index: 2;
+    }
+    .vc-eod svg { flex-shrink: 0; }
+    .vc-eod-time {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--anchovy-0);
+      line-height: 24px;
+    }
+    .vc-eod-unit {
+      font-size: 14px;
+      font-weight: 400;
+      color: var(--anchovy-30);
+      line-height: 20px;
+    }
+    .vcard-body {
+      padding: 12px;
+      padding-top: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      position: relative;
+      z-index: 1;
+      background: var(--bg-surface);
+    }
+    .vcard-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--anchovy-0);
+      line-height: 24px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .vcard-meta {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      line-height: 20px;
+    }
+    .vcard-meta svg { flex-shrink: 0; }
+    .vcard-delivery {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      color: var(--anchovy-30);
+      line-height: 20px;
+    }
+    .vcard-delivery svg { flex-shrink: 0; }
+    .vcard-strike {
+      text-decoration: line-through;
+      color: var(--anchovy-30);
+    }
+
+    /* ── View All Card ── */
+    .view-all-card {
+      min-width: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .view-all-circle {
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: white;
+      border: 1px solid #f1f4f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+    }
+    .view-all-label {
+      font-size: 14px;
+      font-weight: 400;
+      color: white;
+      text-align: center;
+      line-height: 20px;
+    }
+    .desk-view-all-card {
+      min-width: 160px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .desk-view-all-circle {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: white;
+      border: 1px solid #f1f4f4;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    .desk-view-all-label {
+      font-size: 16px;
+      font-weight: 600;
+      color: var(--action);
+      text-align: center;
+      line-height: 24px;
+    }
+
+    /* ── Tab Bar ── */
+    .tab-bar {
+      flex-shrink: 0;
+      height: 86px;
+      background: var(--bg-surface);
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-around;
+      padding-top: 10px;
+      box-shadow: var(--shadow-deep-up);
+    }
+    .tab {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+      flex: 1;
+    }
+    .tab svg { display: block; }
+    .tab-lbl { font-size: 12px; line-height: normal; }
+    .tab-on .tab-lbl { font-weight: 700; color: #03706D; }
+    .tab-off .tab-lbl { font-weight: 400; color: var(--anchovy-30); }
+
+    /* ── View Toggle ── */
+    .view-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      display: flex;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+      overflow: hidden;
+      z-index: 100;
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+    }
+    .view-toggle button {
+      border: none;
+      padding: 10px 20px;
+      cursor: pointer;
+      background: white;
+      color: var(--anchovy-30);
+      transition: all 0.2s;
+    }
+    .view-toggle button.active {
+      background: var(--action);
+      color: white;
+    }
+    .view-toggle button:hover:not(.active) {
+      background: var(--bg-main);
+    }
+
+    /* ── Desktop View ── */
+    .desktop-view { display: none; }
+    .desktop-view.visible { display: block; }
+    .mobile-view.hidden { display: none; }
+
+    .desktop-frame {
+      width: 1200px;
+      background: white;
+      border-radius: 8px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.12);
+      overflow: hidden;
+    }
+
+    .desk-nav {
+      display: flex;
+      align-items: center;
+      padding: 16px 32px;
+      background: white;
+      gap: 24px;
+      border-bottom: 1px solid #f1f4f4;
+    }
+    .desk-logo {
+      flex-shrink: 0;
+    }
+    .desk-logo img { height: 28px; }
+    .desk-search {
+      flex: 1;
+      background: var(--bg-main);
+      border: 1px solid var(--border-light);
+      border-radius: 4px;
+      padding: 10px 16px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 16px;
+      color: var(--text-tertiary);
+    }
+    .desk-nav-actions {
+      display: flex;
+      gap: 12px;
+      margin-left: auto;
+      align-items: center;
+    }
+    .desk-nav-btn {
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      background: white;
+    }
+    .desk-nav-btn img { display: block; }
+
+    .desk-body {
+      display: flex;
+      min-height: 800px;
+    }
+
+    .desk-sidebar {
+      width: 278px;
+      padding: 32px 32px 32px 32px;
+      border-right: 1px solid #f1f4f4;
+      flex-shrink: 0;
+    }
+    .desk-sidebar-section {
+      padding: 16px 0;
+      border-bottom: 1px solid #f1f4f4;
+    }
+    .desk-sidebar-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+    .desk-sidebar-title svg { color: var(--anchovy-30); }
+    .desk-sidebar-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 0;
+      font-size: 14px;
+      color: var(--anchovy-30);
+    }
+    .desk-sidebar-item input { accent-color: var(--action); }
+    .desk-delivery {
+      padding: 0 0 16px;
+    }
+    .desk-delivery-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .desk-delivery-sub {
+      font-size: 14px;
+      color: var(--action);
+      cursor: pointer;
+    }
+    .desk-radio { display: flex; gap: 16px; padding: 8px 0; font-size: 14px; color: var(--anchovy-30); }
+    .desk-radio label { display: flex; align-items: center; gap: 4px; cursor: pointer; }
+    .desk-radio input { accent-color: var(--action); }
+
+    .desk-content {
+      flex: 1;
+      padding: 0 32px 32px;
+      overflow-x: hidden;
+      overflow-y: auto;
+      background: var(--bg-main);
+    }
+
+    .desk-section {
+      padding: 24px 0 16px;
+    }
+    .desk-section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      padding-bottom: 16px;
+    }
+    .desk-section-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: var(--text-primary);
+      line-height: 32px;
+    }
+    .desk-section-link {
+      font-size: 14px;
+      color: var(--action);
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .desk-cards-row {
+      display: flex;
+      gap: 8px;
+      overflow: visible;
+      padding-bottom: 8px;
+    }
+    .desk-scroll-wrap {
+      position: relative;
+      overflow: visible;
+    }
+    .desk-scroll-row {
+      display: flex;
+      gap: 8px;
+      padding-bottom: 10px;
+      overflow-x: auto;
+      scrollbar-width: none;
+      scroll-behavior: smooth;
+    }
+    .desk-scroll-row::-webkit-scrollbar { display: none; }
+    .desk-scroll-arrow {
+      position: absolute;
+      right: -24px;
+      top: 95px;
+      transform: translateY(-50%);
+      cursor: pointer;
+      z-index: 3;
+      border: none;
+      background: none;
+      padding: 0;
+    }
+    .desk-scroll-arrow img {
+      width: 56px;
+      height: 56px;
+    }
+    .desk-card {
+      width: 280px;
+      flex-shrink: 0;
+      background: var(--bg-surface);
+      border-radius: 4px;
+      overflow: visible;
+      box-shadow: 0px 1px 4px 0px rgba(0,0,0,0.08);
+      border: none;
+      position: relative;
+    }
+    .desk-card-img {
+      width: 100%;
+      height: 150px;
+      object-fit: cover;
+      display: block;
+      border-radius: 4px 4px 0 0;
+    }
+    .desk-card-body { padding: 12px; }
+    .desk-card-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--anchovy-0);
+      line-height: 24px;
+    }
+    .desk-card-meta {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-size: 14px;
+      line-height: 20px;
+    }
+    .desk-card-delivery {
+      font-size: 14px;
+      color: var(--anchovy-30);
+      line-height: 20px;
+    }
+    .desk-card-eod {
+      position: absolute;
+      top: 134px;
+      right: 4px;
+      background: white;
+      border: 0.5px solid #f1f4f4;
+      border-radius: 16px;
+      padding: 4px 16px;
+      font-size: 14px;
+      z-index: 2;
+    }
+    .desk-card-eod strong { font-size: 16px; color: var(--anchovy-0); }
+    .desk-card-eod span { color: var(--anchovy-30); }
+
+    .desk-vc-bg {
+      border-radius: 8px;
+      background: linear-gradient(186deg, #03706D 36%, #1BA69C 99%);
+      position: relative;
+      overflow: hidden;
+    }
+    .desk-vc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 24px 12px 24px;
+    }
+    .desk-vc-text { display: flex; flex-direction: column; gap: 4px; }
+    .desk-vc-title {
+      font-size: 24px;
+      font-weight: 700;
+      color: white;
+      line-height: 32px;
+    }
+    .desk-vc-subtitle {
+      font-size: 14px;
+      color: white;
+      line-height: 20px;
+    }
+    .desk-vc-graphic {
+      width: 80px;
+      height: 80px;
+      flex-shrink: 0;
+    }
+    .desk-vc-cards {
+      display: flex;
+      gap: 8px;
+    }
+  </style>
+</head>
+<body>
+
+<!-- View Toggle -->
+<div class="view-toggle">
+  <button id="btn-mobile" class="active" onclick="showView('mobile')">Mobile</button>
+  <button id="btn-desktop" onclick="showView('desktop')">Desktop</button>
+</div>
+
+<!-- Mobile View -->
+<div id="mobile-view" class="mobile-view">
+<div class="phone">
+
+  <!-- Status Bar -->
+  <div class="status-bar" style="padding: 12px 0 8px;">
+    <img src="assets/status-bar.svg" style="width: 100%; height: auto; display: block;">
+  </div>
+
+  <!-- Delivery Header -->
+  <div class="nav-header">
+    <div class="rider-illust"><img src="assets/rider-illust.svg" alt=""></div>
+    <div class="nav-text">
+      <div class="nav-label">Delivery · Now</div>
+      <div class="nav-location">
+        <span class="nav-location-text">Current location</span>
+        <svg class="nav-chevron" width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M5 7l4 4 4-4" stroke="#00CCBC" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </div>
+    </div>
+    <div class="nav-actions">
+      <div class="nav-btn"><img src="assets/icon-heart.svg" alt=""></div>
+      <div class="nav-btn"><img src="assets/icon-user.svg" alt=""></div>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-wrap">
+    <div class="search-field">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="7.5" cy="7.5" r="5.5" stroke="#BAC3C3" stroke-width="1.8"/><path d="M12 12l4 4" stroke="#BAC3C3" stroke-width="1.8" stroke-linecap="round"/></svg>
+      <span class="search-text">Restaurants, groceries, stores</span>
+    </div>
+    <div class="search-filter">
+      <img src="assets/icon-filters.svg" width="18" height="18" alt="">
+    </div>
+  </div>
+
+  <!-- Scrollable Feed -->
+  <div class="feed">
+
+    <!-- Regular Restaurant Carousel -->
+    <div class="h-scroll" style="padding-top: 16px;">
+      <!-- Dishoom -->
+      <div class="rcard">
+        <div class="rcard-img-wrap">
+          <img class="rcard-img" src="assets/dishoom.png" alt="Dishoom">
+          <div class="rcard-fav"><svg width="24" height="24" viewBox="0 0 24 24" fill="rgba(0,0,0,0.2)" stroke="white" stroke-width="1.5"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
+        </div>
+        <div class="eod">
+          <span class="eod-time">10 - 20</span>
+          <span class="eod-unit"> min</span>
+        </div>
+        <div class="rcard-body">
+          <div class="rcard-name">Dishoom</div>
+          <div class="rcard-meta">
+            <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#4D7C1B"/></svg>
+            <span class="c-success">4.8 Excellent</span>
+            <span class="c-anchovy">(500+) · £1.49 delivery</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mr Beast Burger -->
+      <div class="rcard">
+        <div class="rcard-img-wrap">
+          <img class="rcard-img" src="assets/burger.png" alt="Mr Beast Burger">
+          <div class="rcard-fav"><svg width="24" height="24" viewBox="0 0 24 24" fill="rgba(0,0,0,0.2)" stroke="white" stroke-width="1.5"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
+        </div>
+        <div class="eod">
+            <span class="eod-time">20 - 30</span>
+          <span class="eod-unit"> min</span>
+        </div>
+        <div class="rcard-body">
+          <div class="rcard-name">MrBeast Burger</div>
+          <div class="rcard-meta">
+            <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#4D7C1B"/></svg>
+            <span class="c-success">4.6 Excellent</span>
+            <span class="c-anchovy">(300+) · £2.49 delivery</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- German Doner Kebab -->
+      <div class="rcard">
+        <div class="rcard-img-wrap">
+          <img class="rcard-img" src="assets/card-food-ref.png" alt="Bird">
+          <div class="rcard-fav"><svg width="24" height="24" viewBox="0 0 24 24" fill="rgba(0,0,0,0.2)" stroke="white" stroke-width="1.5"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg></div>
+        </div>
+        <div class="eod">
+          <span class="eod-time">10 - 20</span>
+          <span class="eod-unit"> min</span>
+        </div>
+        <div class="rcard-body">
+          <div class="rcard-name">Bird</div>
+          <div class="rcard-meta">
+            <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#4D7C1B"/></svg>
+            <span class="c-success">4.7 Excellent</span>
+            <span class="c-anchovy">(750+) · £1.99 delivery</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Value Carousel -->
+    <div class="vc-wrap">
+      <div class="vc-bg">
+        <div class="vc-header">
+          <div class="vc-text">
+            <div class="vc-title">Great value for money</div>
+            <div class="vc-subtitle">Much loved food from top partners</div>
+          </div>
+          <div class="vc-graphic-svg"><div id="lottie-player" style="width:72px;height:72px;"></div></div>
+        </div>
+        <div class="vc-cards">
+          <!-- Card 1 -->
+          <div class="vcard">
+            <div class="vcard-img-wrap">
+              <img class="vcard-img" src="assets/card-food-1.png" alt="Food">
+              <div class="vcard-fav">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="rgba(0,0,0,0.2)" stroke="white" stroke-width="1.5"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              </div>
+              <div class="vcard-tag">
+                <div class="tag-brand">Only on Deliveroo</div>
+              </div>
+            </div>
+            <div class="vc-eod">
+              <span class="vc-eod-time">10 – 20</span>
+              <span class="vc-eod-unit">min</span>
+            </div>
+            <div class="vcard-body">
+              <div class="vcard-name">LEON</div>
+              <div class="vcard-meta">
+                <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#258518"/></svg>
+                <span class="c-success">4.6 Excellent</span>
+                <span class="c-anchovy">(850+) · 0.4 mi</span>
+              </div>
+              <div class="vcard-delivery">
+                <span>£0.99 delivery</span>
+              </div>
+            </div>
+          </div>
+          <!-- Card 2 -->
+          <div class="vcard">
+            <div class="vcard-img-wrap">
+              <img class="vcard-img" src="assets/card-food-ref.png" alt="Food">
+              <div class="vcard-fav">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="rgba(0,0,0,0.2)" stroke="white" stroke-width="1.5"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                <span class="vcard-fav-count">15</span>
+              </div>
+              <div class="vcard-tag">
+                <div style="display:flex"><div class="tag-crit-line2">Get 20% off</div></div>
+                <div class="tag-brand">Only on Deliveroo</div>
+              </div>
+            </div>
+            <div class="vc-eod">
+              <span class="vc-eod-time">20 – 30</span>
+              <span class="vc-eod-unit">min</span>
+            </div>
+            <div class="vcard-body">
+              <div class="vcard-name">Bird</div>
+              <div class="vcard-meta">
+                <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#258518"/></svg>
+                <span class="c-success">4.8 Excellent</span>
+                <span class="c-anchovy">(320+) · 1.1 mi</span>
+              </div>
+              <div class="vcard-delivery">
+                <span class="vcard-strike">£3.99</span>
+                <span>£1.49 delivery</span>
+              </div>
+            </div>
+          </div>
+          <!-- Card 3 -->
+          <div class="vcard">
+            <div class="vcard-img-wrap">
+              <img class="vcard-img" src="assets/tortilla.png" alt="Food">
+              <div class="vcard-fav">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="rgba(0,0,0,0.2)" stroke="white" stroke-width="1.5"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+              </div>
+              <div class="vcard-tag">
+                <div style="display:flex"><div class="tag-crit-line1">Spend £15</div><div class="tag-crit-line2">Get 20% off</div></div>
+              </div>
+            </div>
+            <div class="vc-eod">
+              <span class="vc-eod-time">15 – 25</span>
+              <span class="vc-eod-unit">min</span>
+            </div>
+            <div class="vcard-body">
+              <div class="vcard-name">Tortilla</div>
+              <div class="vcard-meta">
+                <svg width="18" height="18" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#258518"/></svg>
+                <span class="c-success">4.5 Excellent</span>
+                <span class="c-anchovy">(180+) · 0.7 mi</span>
+              </div>
+              <div class="vcard-delivery">
+                <span>£1.79 delivery</span>
+              </div>
+            </div>
+          </div>
+          <!-- View All -->
+          <div class="view-all-card">
+            <div class="view-all-circle"><img src="assets/arrow-right.svg" width="18" height="13" alt=""></div>
+            <div class="view-all-label">View all (500)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+
+  </div>
+
+  <!-- Tab Bar -->
+  <div class="tab-bar">
+    <div class="tab tab-on">
+      <img src="assets/icon-home.svg" width="24" height="24" alt="">
+      <span class="tab-lbl">Home</span>
+    </div>
+    <div class="tab tab-off">
+      <img src="assets/icon-groceries.svg" width="20" height="20" alt="">
+      <span class="tab-lbl">Groceries</span>
+    </div>
+    <div class="tab tab-off">
+      <img src="assets/icon-shopping.svg" width="24" height="24" alt="">
+      <span class="tab-lbl">Shopping</span>
+    </div>
+    <div class="tab tab-off">
+      <img src="assets/icon-discover.svg" width="24" height="24" alt="">
+      <span class="tab-lbl">Discover</span>
+    </div>
+    <div class="tab tab-off">
+      <img src="assets/icon-reorder.svg" width="24" height="24" alt="">
+      <span class="tab-lbl">Reorder</span>
+    </div>
+    <div style="height: 5px; width: 134px; background: #0b0e0e; border-radius: 100px; position: absolute; bottom: 8px; left: 50%; transform: translateX(-50%);"></div>
+  </div>
+
+</div>
+
+</div><!-- end mobile-view -->
+
+<!-- Desktop View -->
+<div id="desktop-view" class="desktop-view">
+<div class="desktop-frame">
+  <div class="desk-nav">
+    <div class="desk-logo"><img src="assets/deliveroo-logo.svg" height="28" alt="deliveroo"></div>
+    <div class="desk-search">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="7.5" cy="7.5" r="5.5" stroke="#BAC3C3" stroke-width="1.8"/><path d="M12 12l4 4" stroke="#BAC3C3" stroke-width="1.8" stroke-linecap="round"/></svg>
+      Restaurants, groceries, dishes
+    </div>
+    <div class="desk-nav-actions">
+      <div class="desk-nav-btn"><img src="assets/desk-fav.svg" height="40" alt=""></div>
+      <div class="desk-nav-btn"><img src="assets/desk-menu.svg" height="40" alt=""></div>
+    </div>
+  </div>
+
+  <div class="desk-body">
+    <!-- Sidebar -->
+    <div class="desk-sidebar">
+      <div class="desk-delivery">
+        <div style="display:flex; align-items:center; gap:8px; padding-bottom:4px;">
+          <img src="assets/rider-illust.svg" width="36" height="36" alt="">
+          <div>
+            <div style="font-size:14px; color:var(--anchovy-30);">Now</div>
+            <div style="font-size:16px; font-weight:700; color:var(--text-primary);">Home</div>
+          </div>
+          <span class="desk-delivery-sub" style="margin-left:auto;">Change</span>
+        </div>
+        <div class="desk-radio">
+          <label><input type="radio" name="fulfillment" checked> Delivery</label>
+          <label><input type="radio" name="fulfillment"> Pick up</label>
+        </div>
+      </div>
+      <div class="desk-sidebar-section">
+        <div class="desk-sidebar-title">Sort <svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" stroke="#535F5F" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+      </div>
+      <div class="desk-sidebar-section">
+        <div class="desk-sidebar-title">Hygiene rating <svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" stroke="#535F5F" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+      </div>
+      <div class="desk-sidebar-section">
+        <div class="desk-sidebar-title">Offers <svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 10l4-4 4 4" stroke="#535F5F" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+        <div style="padding-top:8px;">
+          <div class="desk-sidebar-item"><input type="radio" name="offers"> All offers (800)</div>
+          <div class="desk-sidebar-item"><input type="radio" name="offers"> Offers near you (400)</div>
+          <div class="desk-sidebar-item"><input type="radio" name="offers"> Entire menu (280)</div>
+          <div class="desk-sidebar-item"><input type="radio" name="offers"> Selected items (50)</div>
+          <div class="desk-sidebar-item"><input type="radio" name="offers"> Buy 1, get 1 free (60)</div>
+          <div class="desk-sidebar-item"><input type="radio" name="offers"> Free items (45)</div>
+          <div class="desk-sidebar-item"><input type="radio" name="offers"> Great value deals for you (50)</div>
+          <div class="desk-sidebar-item"><input type="radio" name="offers"> Grocery deals (19)</div>
+          <div class="desk-sidebar-item"><input type="radio" name="offers"> Low minimum spend deals (211)</div>
+          <div class="desk-sidebar-item"><input type="radio" name="offers"> Meal deals (450)</div>
+        </div>
+      </div>
+      <div class="desk-sidebar-section">
+        <div class="desk-sidebar-title">Dietary <svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" stroke="#535F5F" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+      </div>
+      <div class="desk-sidebar-section">
+        <div class="desk-sidebar-title">Price <svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 6l4 4 4-4" stroke="#535F5F" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+      </div>
+      <div class="desk-sidebar-section">
+        <div class="desk-sidebar-title">Categories <svg width="16" height="16" viewBox="0 0 16 16"><path d="M4 10l4-4 4 4" stroke="#535F5F" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+        <div style="padding-top:8px;">
+          <div class="desk-sidebar-item"><input type="checkbox"> Alcohol (409)</div>
+          <div class="desk-sidebar-item"><input type="checkbox"> American (604)</div>
+          <div class="desk-sidebar-item"><input type="checkbox"> Asian (555)</div>
+          <div class="desk-sidebar-item"><input type="checkbox"> Asian Fusion (98)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="desk-content">
+      <div style="padding: 24px 0 8px;">
+        <div style="font-size:24px; font-weight:700; color:var(--text-primary); padding-bottom: 4px;">Delivering to Location</div>
+      </div>
+
+      <!-- Featured Section -->
+      <div class="desk-section">
+        <div class="desk-section-header">
+          <div>
+            <div class="desk-section-title">Featured</div>
+            <div style="font-size:14px; color:var(--anchovy-30);">Paid placements from our partners</div>
+          </div>
+        </div>
+        <div class="desk-cards-row">
+          <div class="desk-card"><img class="desk-card-img" src="assets/card-food-1.png" alt=""><div class="desk-card-eod"><strong>15 – 25</strong> <span>min</span></div><div class="desk-card-body"><div class="desk-card-name">LEON</div><div class="desk-card-meta"><svg width="16" height="16" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#258518"/></svg><span class="c-success">4.9 Excellent</span><span class="c-anchovy">(1200+) · 0.3 mi</span></div><div class="desk-card-delivery">£0.99 delivery</div></div></div>
+          <div class="desk-card"><img class="desk-card-img" src="assets/card-food-ref.png" alt=""><div class="desk-card-eod"><strong>25 – 35</strong> <span>min</span></div><div class="desk-card-body"><div class="desk-card-name">Bird</div><div class="desk-card-meta"><svg width="16" height="16" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#258518"/></svg><span class="c-success">4.7 Excellent</span><span class="c-anchovy">(420+) · 1.4 mi</span></div><div class="desk-card-delivery">£2.49 delivery</div></div></div>
+          <div class="desk-card"><img class="desk-card-img" src="assets/tortilla.png" alt=""><div class="desk-card-eod"><strong>10 – 20</strong> <span>min</span></div><div class="desk-card-body"><div class="desk-card-name">Tortilla</div><div class="desk-card-meta"><svg width="16" height="16" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#258518"/></svg><span class="c-success">4.5 Excellent</span><span class="c-anchovy">(180+) · 0.6 mi</span></div><div class="desk-card-delivery">£1.49 delivery</div></div></div>
+        </div>
+      </div>
+
+      <!-- Arriving in around 20 mins (Speed carousel - desktop) -->
+      <div class="desk-section" style="position: relative;">
+        <div class="desk-vc-bg">
+          <div class="desk-vc-header">
+            <div class="desk-vc-text">
+              <div style="display:flex; align-items:baseline; gap:16px;">
+                <div class="desk-vc-title">Great value for money</div>
+                <span style="font-size:14px; font-weight:400; color:rgba(255,255,255,0.8); cursor:pointer;">View all (31)</span>
+              </div>
+              <div class="desk-vc-subtitle">Much loved food from top partners</div>
+            </div>
+            <div class="desk-vc-graphic" id="lottie-desktop-speed" style="width:80px;height:80px;"></div>
+          </div>
+          <div class="desk-scroll-wrap">
+          <div class="desk-scroll-row" id="speed-scroll" style="padding: 0 16px 16px 16px;">
+            <div class="desk-card"><img class="desk-card-img" src="assets/card-food-1.png" alt=""><div class="desk-card-eod"><strong>10 – 20</strong> <span>min</span></div><div class="desk-card-body"><div class="desk-card-name">LEON</div><div class="desk-card-meta"><svg width="16" height="16" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#258518"/></svg><span class="c-success">4.6 Excellent</span><span class="c-anchovy">(850+) · 0.4 mi</span></div><div class="desk-card-delivery">£0.99 delivery</div></div></div>
+            <div class="desk-card"><img class="desk-card-img" src="assets/card-food-ref.png" alt=""><div class="desk-card-eod"><strong>15 – 25</strong> <span>min</span></div><div class="desk-card-body"><div class="desk-card-name">Bird</div><div class="desk-card-meta"><svg width="16" height="16" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#258518"/></svg><span class="c-success">4.8 Excellent</span><span class="c-anchovy">(320+) · 1.1 mi</span></div><div class="desk-card-delivery">£1.49 delivery</div></div></div>
+            <div class="desk-card"><img class="desk-card-img" src="assets/tortilla.png" alt=""><div class="desk-card-eod"><strong>20 – 30</strong> <span>min</span></div><div class="desk-card-body"><div class="desk-card-name">Tortilla</div><div class="desk-card-meta"><svg width="16" height="16" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#258518"/></svg><span class="c-success">4.4 Good</span><span class="c-anchovy">(600+) · 0.9 mi</span></div><div class="desk-card-delivery">£1.99 delivery</div></div></div>
+            <div class="desk-card"><img class="desk-card-img" src="assets/dishoom.png" alt=""><div class="desk-card-eod"><strong>25 – 35</strong> <span>min</span></div><div class="desk-card-body"><div class="desk-card-name">Dishoom</div><div class="desk-card-meta"><svg width="16" height="16" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#258518"/></svg><span class="c-success">4.9 Excellent</span><span class="c-anchovy">(1500+) · 1.8 mi</span></div><div class="desk-card-delivery">£2.49 delivery</div></div></div>
+          </div>
+        </div>
+        </div>
+        <button class="desk-scroll-arrow" onclick="document.getElementById('speed-scroll').scrollLeft += 300" style="top: 55%;">
+          <img src="assets/floating-arrow.svg" alt="Scroll">
+        </button>
+      </div>
+
+      <!-- Popular near you (desktop) -->
+      <div class="desk-section">
+        <div class="desk-section-header">
+          <div class="desk-section-title">Popular near you</div>
+          <a href="#" class="desk-section-link">View all (655)</a>
+        </div>
+        <div class="desk-scroll-wrap">
+          <div class="desk-scroll-row" id="value-scroll" style="padding-bottom: 10px;">
+            <div class="desk-card"><img class="desk-card-img" src="assets/card-food-1.png" alt=""><div class="desk-card-eod"><strong>15 – 25</strong> <span>min</span></div><div class="desk-card-body"><div class="desk-card-name">LEON</div><div class="desk-card-meta"><svg width="16" height="16" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#258518"/></svg><span class="c-success">4.7 Excellent</span><span class="c-anchovy">(750+) · 0.5 mi</span></div><div class="desk-card-delivery">£1.29 delivery</div></div></div>
+            <div class="desk-card"><img class="desk-card-img" src="assets/card-food-ref.png" alt=""><div class="desk-card-eod"><strong>20 – 30</strong> <span>min</span></div><div class="desk-card-body"><div class="desk-card-name">Bird</div><div class="desk-card-meta"><svg width="16" height="16" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#258518"/></svg><span class="c-success">4.6 Excellent</span><span class="c-anchovy">(900+) · 1.3 mi</span></div><div class="desk-card-delivery">£1.99 delivery</div></div></div>
+            <div class="desk-card"><img class="desk-card-img" src="assets/tortilla.png" alt=""><div class="desk-card-eod"><strong>10 – 15</strong> <span>min</span></div><div class="desk-card-body"><div class="desk-card-name">Tortilla</div><div class="desk-card-meta"><svg width="16" height="16" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#258518"/></svg><span class="c-success">4.8 Excellent</span><span class="c-anchovy">(440+) · 0.2 mi</span></div><div class="desk-card-delivery">Free delivery</div></div></div>
+            <div class="desk-card"><img class="desk-card-img" src="assets/dishoom.png" alt=""><div class="desk-card-eod"><strong>25 – 35</strong> <span>min</span></div><div class="desk-card-body"><div class="desk-card-name">Dishoom</div><div class="desk-card-meta"><svg width="16" height="16" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#258518"/></svg><span class="c-success">4.9 Excellent</span><span class="c-anchovy">(1500+) · 1.8 mi</span></div><div class="desk-card-delivery">£2.49 delivery</div></div></div>
+            <div class="desk-card"><img class="desk-card-img" src="assets/burger.png" alt=""><div class="desk-card-eod"><strong>15 – 20</strong> <span>min</span></div><div class="desk-card-body"><div class="desk-card-name">MrBeast Burger</div><div class="desk-card-meta"><svg width="16" height="16" viewBox="0 0 18 18"><path d="M9 1.5l2.1 4.3 4.7.7-3.4 3.3.8 4.7L9 12.2 4.8 14.5l.8-4.7L2.2 6.5l4.7-.7z" fill="#258518"/></svg><span class="c-success">4.6 Excellent</span><span class="c-anchovy">(300+) · 0.8 mi</span></div><div class="desk-card-delivery">£2.29 delivery</div></div></div>
+          </div>
+          <button class="desk-scroll-arrow" onclick="document.getElementById('value-scroll').scrollLeft += 300">
+            <img src="assets/floating-arrow.svg" alt="Scroll">
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+</div><!-- end desktop-view -->
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lottie-web/5.12.2/lottie.min.js"></script>
+<script>
+  function initLottie(containerId) {
+    var a = lottie.loadAnimation({
+      container: document.getElementById(containerId),
+      renderer: 'svg',
+      loop: false,
+      autoplay: true,
+      path: 'value-carousel-lottie.json?v=' + Date.now()
+    });
+    a.addEventListener('complete', function() {
+      setTimeout(function() { a.goToAndPlay(0); }, 3000);
+    });
+    return a;
+  }
+
+  var mobileAnim = initLottie('lottie-player');
+
+  function showView(view) {
+    var mobile = document.getElementById('mobile-view');
+    var desktop = document.getElementById('desktop-view');
+    var btnMobile = document.getElementById('btn-mobile');
+    var btnDesktop = document.getElementById('btn-desktop');
+
+    if (view === 'mobile') {
+      mobile.classList.remove('hidden');
+      mobile.classList.add('visible');
+      desktop.classList.remove('visible');
+      desktop.classList.add('hidden');
+      btnMobile.classList.add('active');
+      btnDesktop.classList.remove('active');
+      document.body.style.padding = '40px 20px';
+    } else {
+      desktop.classList.remove('hidden');
+      desktop.classList.add('visible');
+      mobile.classList.remove('visible');
+      mobile.classList.add('hidden');
+      btnDesktop.classList.add('active');
+      btnMobile.classList.remove('active');
+      document.body.style.padding = '20px';
+
+      setTimeout(function() {
+        if (!window.desktopLottieLoaded) {
+          initLottie('lottie-desktop-speed');
+          window.desktopLottieLoaded = true;
+        }
+      }, 100);
+    }
+  }
+</script>
+
+</body>
+</html>
